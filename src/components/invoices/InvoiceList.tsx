@@ -37,6 +37,20 @@ interface InvoiceListProps {
 export function InvoiceList({ invoices, onEdit, onDelete, onView }: InvoiceListProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [columnFilters, setColumnFilters] = useState({
+    invoiceNumber: "",
+    customer: "",
+    project: "",
+    amount: "",
+    date: "",
+  });
+
+  const handleColumnFilterChange = (column: string, value: string) => {
+    setColumnFilters(prev => ({
+      ...prev,
+      [column]: value
+    }));
+  };
 
   const filteredInvoices = invoices.filter(invoice => {
     const matchesSearch = invoice.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -45,7 +59,14 @@ export function InvoiceList({ invoices, onEdit, onDelete, onView }: InvoiceListP
     
     const matchesStatus = statusFilter === "all" || invoice.status === statusFilter;
     
-    return matchesSearch && matchesStatus;
+    const matchesColumnFilters = 
+      invoice.invoiceNumber.toLowerCase().includes(columnFilters.invoiceNumber.toLowerCase()) &&
+      invoice.customer.toLowerCase().includes(columnFilters.customer.toLowerCase()) &&
+      invoice.project.toLowerCase().includes(columnFilters.project.toLowerCase()) &&
+      (columnFilters.amount === "" || invoice.amount.toString().includes(columnFilters.amount)) &&
+      (columnFilters.date === "" || invoice.date.includes(columnFilters.date));
+    
+    return matchesSearch && matchesStatus && matchesColumnFilters;
   });
 
   const formatCurrency = (amount: number, currency: string) => {
@@ -119,11 +140,61 @@ export function InvoiceList({ invoices, onEdit, onDelete, onView }: InvoiceListP
         <Table>
           <TableHeader>
             <TableRow className="bg-slate-50">
-              <TableHead className="font-semibold text-slate-700">Invoice #</TableHead>
-              <TableHead className="font-semibold text-slate-700">Customer</TableHead>
-              <TableHead className="font-semibold text-slate-700">Project</TableHead>
-              <TableHead className="font-semibold text-slate-700">Amount</TableHead>
-              <TableHead className="font-semibold text-slate-700">Date</TableHead>
+              <TableHead className="font-semibold text-slate-700">
+                <div className="space-y-2">
+                  <div>Invoice #</div>
+                  <Input
+                    placeholder="Filter..."
+                    value={columnFilters.invoiceNumber}
+                    onChange={(e) => handleColumnFilterChange("invoiceNumber", e.target.value)}
+                    className="h-8 text-xs"
+                  />
+                </div>
+              </TableHead>
+              <TableHead className="font-semibold text-slate-700">
+                <div className="space-y-2">
+                  <div>Customer</div>
+                  <Input
+                    placeholder="Filter..."
+                    value={columnFilters.customer}
+                    onChange={(e) => handleColumnFilterChange("customer", e.target.value)}
+                    className="h-8 text-xs"
+                  />
+                </div>
+              </TableHead>
+              <TableHead className="font-semibold text-slate-700">
+                <div className="space-y-2">
+                  <div>Project</div>
+                  <Input
+                    placeholder="Filter..."
+                    value={columnFilters.project}
+                    onChange={(e) => handleColumnFilterChange("project", e.target.value)}
+                    className="h-8 text-xs"
+                  />
+                </div>
+              </TableHead>
+              <TableHead className="font-semibold text-slate-700">
+                <div className="space-y-2">
+                  <div>Amount</div>
+                  <Input
+                    placeholder="Filter..."
+                    value={columnFilters.amount}
+                    onChange={(e) => handleColumnFilterChange("amount", e.target.value)}
+                    className="h-8 text-xs"
+                  />
+                </div>
+              </TableHead>
+              <TableHead className="font-semibold text-slate-700">
+                <div className="space-y-2">
+                  <div>Date</div>
+                  <Input
+                    placeholder="Filter..."
+                    value={columnFilters.date}
+                    onChange={(e) => handleColumnFilterChange("date", e.target.value)}
+                    className="h-8 text-xs"
+                  />
+                </div>
+              </TableHead>
               <TableHead className="font-semibold text-slate-700">Status</TableHead>
               <TableHead className="font-semibold text-slate-700 text-right">Actions</TableHead>
             </TableRow>
@@ -180,7 +251,7 @@ export function InvoiceList({ invoices, onEdit, onDelete, onView }: InvoiceListP
           </div>
           <h3 className="text-lg font-medium text-slate-900 mb-2">No invoices found</h3>
           <p className="text-slate-500">
-            {searchTerm || statusFilter !== "all" 
+            {searchTerm || statusFilter !== "all" || Object.values(columnFilters).some(filter => filter !== "")
               ? "Try adjusting your search or filter criteria" 
               : "Create your first invoice to get started"}
           </p>
