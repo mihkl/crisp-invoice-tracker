@@ -1,10 +1,8 @@
-
 import { useState } from "react";
 import { InvoiceList } from "@/components/invoices/InvoiceList";
 import { InvoiceForm } from "@/components/invoices/InvoiceForm";
 import { InvoiceDetails } from "@/components/invoices/InvoiceDetails";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Settings } from "lucide-react";
 import { Invoice } from "@/types/invoice";
 
@@ -104,19 +102,6 @@ const Index = () => {
             <div className="flex items-center gap-4">
               {currentView === 'list' && (
                 <>
-                  <div className="flex items-center gap-2">
-                    <label className="text-sm font-medium text-slate-700">Version:</label>
-                    <Select value={selectedVersion} onValueChange={setSelectedVersion}>
-                      <SelectTrigger className="w-32">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="v1">Version 1.0</SelectItem>
-                        <SelectItem value="v2">Version 2.0</SelectItem>
-                        <SelectItem value="v3">Version 3.0</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
                   <Button 
                     onClick={handleAdminPanel}
                     variant="outline"
