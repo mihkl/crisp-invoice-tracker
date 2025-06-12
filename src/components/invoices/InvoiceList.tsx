@@ -15,6 +15,10 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { 
@@ -22,7 +26,8 @@ import {
   MoreHorizontal, 
   Eye, 
   Edit, 
-  Trash2
+  Trash2,
+  RefreshCw
 } from "lucide-react";
 
 interface InvoiceListProps {
@@ -46,6 +51,11 @@ export function InvoiceList({ invoices, onEdit, onDelete, onView }: InvoiceListP
       ...prev,
       [column]: value
     }));
+  };
+
+  const handleChangeVersion = (invoice: Invoice, version: string) => {
+    console.log(`Changing invoice ${invoice.id} to version ${version}`);
+    // Version change functionality will be implemented later
   };
 
   const filteredInvoices = invoices.filter(invoice => {
@@ -170,6 +180,25 @@ export function InvoiceList({ invoices, onEdit, onDelete, onView }: InvoiceListP
                         <Edit className="mr-2 h-4 w-4" />
                         Edit Invoice
                       </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuSub>
+                        <DropdownMenuSubTrigger>
+                          <RefreshCw className="mr-2 h-4 w-4" />
+                          Change Version
+                        </DropdownMenuSubTrigger>
+                        <DropdownMenuSubContent>
+                          <DropdownMenuItem onClick={() => handleChangeVersion(invoice, "v1")}>
+                            Version 1.0
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleChangeVersion(invoice, "v2")}>
+                            Version 2.0
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleChangeVersion(invoice, "v3")}>
+                            Version 3.0
+                          </DropdownMenuItem>
+                        </DropdownMenuSubContent>
+                      </DropdownMenuSub>
+                      <DropdownMenuSeparator />
                       <DropdownMenuItem 
                         onClick={() => onDelete(invoice.id)}
                         className="text-red-600 focus:text-red-600"

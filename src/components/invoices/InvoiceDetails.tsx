@@ -1,21 +1,9 @@
 
 import { Invoice } from "@/types/invoice";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { 
-  ArrowLeft, 
-  Edit, 
-  Trash2, 
-  Download, 
-  Send,
-  Calendar,
-  User,
-  Briefcase,
-  FileText,
-  DollarSign
-} from "lucide-react";
+import { ArrowLeft, Edit, Trash2, Download } from "lucide-react";
 
 interface InvoiceDetailsProps {
   invoice: Invoice;
@@ -40,28 +28,9 @@ export function InvoiceDetails({ invoice, onEdit, onBack, onDelete }: InvoiceDet
     });
   };
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'paid':
-        return <Badge className="bg-green-100 text-green-800 hover:bg-green-100 text-sm px-3 py-1">Paid</Badge>;
-      case 'pending':
-        return <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100 text-sm px-3 py-1">Pending</Badge>;
-      case 'overdue':
-        return <Badge className="bg-red-100 text-red-800 hover:bg-red-100 text-sm px-3 py-1">Overdue</Badge>;
-      default:
-        return <Badge variant="secondary" className="text-sm px-3 py-1">{status}</Badge>;
-    }
-  };
-
-  const calculateDaysUntilDue = () => {
-    const today = new Date();
-    const dueDate = new Date(invoice.dueDate);
-    const diffTime = dueDate.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
-    if (diffDays < 0) return `${Math.abs(diffDays)} days overdue`;
-    if (diffDays === 0) return "Due today";
-    return `Due in ${diffDays} days`;
+  const handleDownload = () => {
+    // Download functionality would be implemented here
+    console.log("Download invoice:", invoice.id);
   };
 
   return (
@@ -69,34 +38,26 @@ export function InvoiceDetails({ invoice, onEdit, onBack, onDelete }: InvoiceDet
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" onClick={onBack} className="p-2 hover:bg-slate-100">
+          <Button variant="ghost" onClick={onBack} className="p-2">
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>
-            <h2 className="text-2xl font-bold text-slate-900">Invoice Details</h2>
-            <p className="text-slate-600">Invoice {invoice.invoiceNumber}</p>
+            <h1 className="text-2xl font-bold text-slate-900">Invoice Details</h1>
+            <p className="text-slate-600">Invoice ID: {invoice.id}</p>
           </div>
         </div>
-        
-        <div className="flex items-center gap-2">
-          <Button variant="outline" className="border-slate-200 hover:bg-slate-50">
+        <div className="flex gap-3">
+          <Button variant="outline" onClick={handleDownload}>
             <Download className="mr-2 h-4 w-4" />
-            Download
+            Download PDF
           </Button>
-          <Button variant="outline" className="border-slate-200 hover:bg-slate-50">
-            <Send className="mr-2 h-4 w-4" />
-            Send
-          </Button>
-          <Button onClick={onEdit} className="bg-blue-600 hover:bg-blue-700 text-white">
+          <Button variant="outline" onClick={onEdit}>
             <Edit className="mr-2 h-4 w-4" />
-            Edit
+            Edit Invoice
           </Button>
-          <Button 
-            variant="outline" 
-            onClick={onDelete}
-            className="border-red-200 text-red-600 hover:bg-red-50"
-          >
-            <Trash2 className="h-4 w-4" />
+          <Button variant="destructive" onClick={onDelete}>
+            <Trash2 className="mr-2 h-4 w-4" />
+            Delete Invoice
           </Button>
         </div>
       </div>
@@ -104,143 +65,59 @@ export function InvoiceDetails({ invoice, onEdit, onBack, onDelete }: InvoiceDet
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Invoice Details */}
         <div className="lg:col-span-2 space-y-6">
-          <Card className="p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-semibold text-slate-900">Invoice Information</h3>
-              {getStatusBadge(invoice.status)}
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <div className="p-2 bg-blue-100 rounded-lg">
-                    <User className="h-5 w-5 text-blue-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-slate-500">Customer</p>
-                    <p className="text-lg font-semibold text-slate-900">{invoice.customer}</p>
-                  </div>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg text-slate-800">Invoice Information</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-slate-600">Customer</label>
+                  <p className="text-slate-900 font-medium">{invoice.customer}</p>
                 </div>
-
-                <div className="flex items-start gap-3">
-                  <div className="p-2 bg-purple-100 rounded-lg">
-                    <Briefcase className="h-5 w-5 text-purple-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-slate-500">Project</p>
-                    <p className="text-lg font-semibold text-slate-900">{invoice.project}</p>
-                  </div>
+                <div>
+                  <label className="text-sm font-medium text-slate-600">Project</label>
+                  <p className="text-slate-900 font-medium">{invoice.project}</p>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-slate-600">Amount</label>
+                  <p className="text-2xl font-bold text-slate-900">
+                    {formatCurrency(invoice.amount, invoice.currency)}
+                  </p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-slate-600">Currency</label>
+                  <p className="text-slate-900 font-medium">{invoice.currency}</p>
                 </div>
               </div>
 
-              <div className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <div className="p-2 bg-green-100 rounded-lg">
-                    <DollarSign className="h-5 w-5 text-green-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-slate-500">Amount</p>
-                    <p className="text-2xl font-bold text-slate-900">
-                      {formatCurrency(invoice.amount, invoice.currency)}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <div className="p-2 bg-orange-100 rounded-lg">
-                    <Calendar className="h-5 w-5 text-orange-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-slate-500">Due Date</p>
-                    <p className="text-lg font-semibold text-slate-900">{formatDate(invoice.dueDate)}</p>
-                    <p className="text-sm text-slate-600">{calculateDaysUntilDue()}</p>
-                  </div>
-                </div>
+              <div>
+                <label className="text-sm font-medium text-slate-600">Description</label>
+                <p className="text-slate-900">{invoice.description || 'No description provided'}</p>
               </div>
-            </div>
-
-            <Separator className="my-6" />
-
-            <div>
-              <div className="flex items-center gap-3 mb-3">
-                <div className="p-2 bg-slate-100 rounded-lg">
-                  <FileText className="h-5 w-5 text-slate-600" />
-                </div>
-                <h4 className="text-lg font-semibold text-slate-900">Description</h4>
-              </div>
-              <p className="text-slate-700 leading-relaxed bg-slate-50 p-4 rounded-lg">
-                {invoice.description}
-              </p>
-            </div>
+            </CardContent>
           </Card>
         </div>
 
-        {/* Summary Card */}
+        {/* Sidebar with dates and status */}
         <div className="space-y-6">
-          <Card className="p-6">
-            <h3 className="text-lg font-semibold text-slate-900 mb-4">Invoice Summary</h3>
-            
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-slate-600">Invoice Number:</span>
-                <span className="font-medium text-slate-900">{invoice.invoiceNumber}</span>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg text-slate-800">Timeline</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <label className="text-sm font-medium text-slate-600">Invoice Date</label>
+                <p className="text-slate-900 font-medium">{formatDate(invoice.date)}</p>
               </div>
-              
-              <div className="flex justify-between items-center">
-                <span className="text-slate-600">Issue Date:</span>
-                <span className="font-medium text-slate-900">{formatDate(invoice.date)}</span>
+              <div>
+                <label className="text-sm font-medium text-slate-600">Due Date</label>
+                <p className="text-slate-900 font-medium">{formatDate(invoice.dueDate)}</p>
               </div>
-              
-              <div className="flex justify-between items-center">
-                <span className="text-slate-600">Due Date:</span>
-                <span className="font-medium text-slate-900">{formatDate(invoice.dueDate)}</span>
-              </div>
-              
-              <div className="flex justify-between items-center">
-                <span className="text-slate-600">Currency:</span>
-                <span className="font-medium text-slate-900">{invoice.currency}</span>
-              </div>
-
-              <Separator className="my-4" />
-              
-              <div className="flex justify-between items-center text-lg">
-                <span className="font-semibold text-slate-900">Total Amount:</span>
-                <span className="font-bold text-slate-900">
-                  {formatCurrency(invoice.amount, invoice.currency)}
-                </span>
-              </div>
-            </div>
-          </Card>
-
-          {/* Quick Actions */}
-          <Card className="p-6">
-            <h3 className="text-lg font-semibold text-slate-900 mb-4">Quick Actions</h3>
-            
-            <div className="space-y-3">
-              <Button 
-                variant="outline" 
-                className="w-full justify-start border-slate-200 hover:bg-slate-50"
-              >
-                <Download className="mr-2 h-4 w-4" />
-                Download PDF
-              </Button>
-              
-              <Button 
-                variant="outline" 
-                className="w-full justify-start border-slate-200 hover:bg-slate-50"
-              >
-                <Send className="mr-2 h-4 w-4" />
-                Send to Customer
-              </Button>
-              
-              <Button 
-                onClick={onEdit}
-                className="w-full justify-start bg-blue-600 hover:bg-blue-700 text-white"
-              >
-                <Edit className="mr-2 h-4 w-4" />
-                Edit Invoice
-              </Button>
-            </div>
+            </CardContent>
           </Card>
         </div>
       </div>
