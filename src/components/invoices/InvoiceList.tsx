@@ -3,7 +3,6 @@ import { useState } from "react";
 import { Invoice } from "@/types/invoice";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { 
   Table, 
   TableBody, 
@@ -23,8 +22,7 @@ import {
   MoreHorizontal, 
   Eye, 
   Edit, 
-  Trash2,
-  Filter
+  Trash2
 } from "lucide-react";
 
 interface InvoiceListProps {
@@ -36,9 +34,7 @@ interface InvoiceListProps {
 
 export function InvoiceList({ invoices, onEdit, onDelete, onView }: InvoiceListProps) {
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
   const [columnFilters, setColumnFilters] = useState({
-    invoiceNumber: "",
     customer: "",
     project: "",
     amount: "",
@@ -54,19 +50,15 @@ export function InvoiceList({ invoices, onEdit, onDelete, onView }: InvoiceListP
 
   const filteredInvoices = invoices.filter(invoice => {
     const matchesSearch = invoice.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         invoice.project.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         invoice.invoiceNumber.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesStatus = statusFilter === "all" || invoice.status === statusFilter;
+                         invoice.project.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesColumnFilters = 
-      invoice.invoiceNumber.toLowerCase().includes(columnFilters.invoiceNumber.toLowerCase()) &&
       invoice.customer.toLowerCase().includes(columnFilters.customer.toLowerCase()) &&
       invoice.project.toLowerCase().includes(columnFilters.project.toLowerCase()) &&
       (columnFilters.amount === "" || invoice.amount.toString().includes(columnFilters.amount)) &&
       (columnFilters.date === "" || invoice.date.includes(columnFilters.date));
     
-    return matchesSearch && matchesStatus && matchesColumnFilters;
+    return matchesSearch && matchesColumnFilters;
   });
 
   const formatCurrency = (amount: number, currency: string) => {
@@ -84,19 +76,6 @@ export function InvoiceList({ invoices, onEdit, onDelete, onView }: InvoiceListP
     });
   };
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'paid':
-        return <Badge className="bg-green-100 text-green-800 hover:bg-green-100">Paid</Badge>;
-      case 'pending':
-        return <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100">Pending</Badge>;
-      case 'overdue':
-        return <Badge className="bg-red-100 text-red-800 hover:bg-red-100">Overdue</Badge>;
-      default:
-        return <Badge variant="secondary">{status}</Badge>;
-    }
-  };
-
   return (
     <div className="p-6">
       {/* Header */}
@@ -110,29 +89,6 @@ export function InvoiceList({ invoices, onEdit, onDelete, onView }: InvoiceListP
             className="pl-10 border-slate-200 focus:border-blue-500 focus:ring-blue-500"
           />
         </div>
-        
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="border-slate-200 hover:bg-slate-50">
-              <Filter className="mr-2 h-4 w-4" />
-              Status: {statusFilter === "all" ? "All" : statusFilter}
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuItem onClick={() => setStatusFilter("all")}>
-              All Status
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setStatusFilter("pending")}>
-              Pending
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setStatusFilter("paid")}>
-              Paid
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setStatusFilter("overdue")}>
-              Overdue
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
       </div>
 
       {/* Table */}
@@ -140,17 +96,6 @@ export function InvoiceList({ invoices, onEdit, onDelete, onView }: InvoiceListP
         <Table>
           <TableHeader>
             <TableRow className="bg-slate-50">
-              <TableHead className="font-semibold text-slate-700">
-                <div className="space-y-2">
-                  <div>Invoice #</div>
-                  <Input
-                    placeholder="Filter..."
-                    value={columnFilters.invoiceNumber}
-                    onChange={(e) => handleColumnFilterChange("invoiceNumber", e.target.value)}
-                    className="h-8 text-xs"
-                  />
-                </div>
-              </TableHead>
               <TableHead className="font-semibold text-slate-700">
                 <div className="space-y-2">
                   <div>Customer</div>
@@ -195,23 +140,20 @@ export function InvoiceList({ invoices, onEdit, onDelete, onView }: InvoiceListP
                   />
                 </div>
               </TableHead>
-              <TableHead className="font-semibold text-slate-700">Status</TableHead>
+              <TableHead className="font-semibold text-slate-700">Due Date</TableHead>
               <TableHead className="font-semibold text-slate-700 text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredInvoices.map((invoice) => (
               <TableRow key={invoice.id} className="hover:bg-slate-50 transition-colors duration-150">
-                <TableCell className="font-medium text-slate-900">
-                  {invoice.invoiceNumber}
-                </TableCell>
                 <TableCell className="text-slate-700">{invoice.customer}</TableCell>
                 <TableCell className="text-slate-700">{invoice.project}</TableCell>
                 <TableCell className="font-semibold text-slate-900">
                   {formatCurrency(invoice.amount, invoice.currency)}
                 </TableCell>
                 <TableCell className="text-slate-600">{formatDate(invoice.date)}</TableCell>
-                <TableCell>{getStatusBadge(invoice.status)}</TableCell>
+                <TableCell className="text-slate-600">{formatDate(invoice.dueDate)}</TableCell>
                 <TableCell className="text-right">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -251,7 +193,7 @@ export function InvoiceList({ invoices, onEdit, onDelete, onView }: InvoiceListP
           </div>
           <h3 className="text-lg font-medium text-slate-900 mb-2">No invoices found</h3>
           <p className="text-slate-500">
-            {searchTerm || statusFilter !== "all" || Object.values(columnFilters).some(filter => filter !== "")
+            {searchTerm || Object.values(columnFilters).some(filter => filter !== "")
               ? "Try adjusting your search or filter criteria" 
               : "Create your first invoice to get started"}
           </p>

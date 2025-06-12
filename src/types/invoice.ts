@@ -1,7 +1,6 @@
 
 export interface Invoice {
   id: string;
-  invoiceNumber: string;
   customer: string;
   project: string;
   amount: number;
@@ -9,7 +8,6 @@ export interface Invoice {
   description: string;
   date: string;
   dueDate: string;
-  status: 'pending' | 'paid' | 'overdue';
 }
 
-export type InvoiceFormData = Omit<Invoice, 'id' | 'invoiceNumber'>;
+export type InvoiceFormData = Omit<Invoice, 'id'>;

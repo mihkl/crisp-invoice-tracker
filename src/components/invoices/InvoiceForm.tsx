@@ -24,8 +24,7 @@ export function InvoiceForm({ onSubmit, onCancel, initialData, isEditing = false
     currency: initialData?.currency || "USD",
     description: initialData?.description || "",
     date: initialData?.date || new Date().toISOString().split('T')[0],
-    dueDate: initialData?.dueDate || "",
-    status: initialData?.status || "pending"
+    dueDate: initialData?.dueDate || ""
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -150,20 +149,6 @@ export function InvoiceForm({ onSubmit, onCancel, initialData, isEditing = false
                   required
                 />
               </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="status">Status *</Label>
-              <Select value={formData.status} onValueChange={(value) => handleChange("status", value as "pending" | "paid" | "overdue")}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="paid">Paid</SelectItem>
-                  <SelectItem value="overdue">Overdue</SelectItem>
-                </SelectContent>
-              </Select>
             </div>
 
             <div className="flex gap-3 pt-4">
